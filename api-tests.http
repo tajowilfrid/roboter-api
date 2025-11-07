@@ -1,0 +1,50 @@
+# Definiert eine Variable für den Host.
+# Wenn du deinen Port änderst, musst du es nur hier tun.
+@host = http://localhost:8090
+
+
+### 1. Status von Roboter "r1" abrufen
+# @name testGetStatus
+GET {{host}}/robots/r1/status
+
+### 2. Roboter "r1" bewegen (up)
+POST {{host}}/robots/r1/move
+Content-Type: application/json
+
+{
+  "direction": "up"
+}
+
+### 3. Gegenstand "diamant" aufheben
+POST {{host}}/robots/r1/pickup/diamant
+
+### 4. Energie von "r1" patchen
+PATCH {{host}}/robots/r1/state
+Content-Type: application/json
+
+{
+  "energy": 80
+}
+
+### 5. Position von "r1" patchen (alternativer Patch)
+PATCH {{host}}/robots/r1/state
+Content-Type: application/json
+
+{
+  "position": {
+    "x": 10,
+    "y": 20
+  }
+}
+
+### 6. Aktionen von "r1" abrufen
+GET {{host}}/robots/r1/actions
+
+### 7. Roboter "r1" greift "r2" an
+POST {{host}}/robots/r1/attack/r2
+
+### 8. Status von "r2" prüfen (um den Angriff zu sehen)
+GET {{host}}/robots/r2/status
+
+### 9. Test: Nicht existierenden Roboter abrufen (sollte 404 geben)
+GET {{host}}/robots/r99/status
