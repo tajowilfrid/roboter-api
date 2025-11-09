@@ -51,4 +51,14 @@ public class Robot extends RepresentationModel<Robot> {
             new RobotAction(newId, action, detail, Instant.now())
         );
     }
+    
+    // HIER IST DER ZWEITE FIX:
+    // Diese Methode hat in Robot.java gefehlt und den Bug der
+    // doppelten Links in der /status-Antwort verursacht.
+    @Override
+    @org.springframework.lang.NonNull
+    public Robot removeLinks() {
+        super.removeLinks();
+        return this;
+    }
 }
