@@ -1,13 +1,13 @@
-# Definiert eine Variable für den Host.
-# Wenn du deinen Port änderst, musst du es nur hier tun.
+# Defines a host variable.
+# If the port changes, only change it here.
 @host = http://localhost:8090
 
-### 1. Status von Roboter "r1" abrufen (mit HATEOAS Links)
+### 1. Get status for robot "r1" (with HATEOAS Links)
 # @name testGetStatus
 GET {{host}}/robots/r1/status
 
-# ERWARTETE ANTWORT:
-# Das JSON enthält jetzt ein "_links" Feld, das auf "self" und "actions" zeigt:
+# EXPECTED RESPONSE:
+# The JSON now includes a "_links" field pointing to "self" and "actions":
 #
 # {
 #   "id": "r1",
@@ -22,8 +22,8 @@ GET {{host}}/robots/r1/status
 # }
 
 
-### 2. Ein paar Aktionen generieren (4x bewegen)
-### Roboter "r1" move up
+### 2. Generate some actions
+### Robot "r1" move up
 POST {{host}}/robots/r1/move
 Content-Type: application/json
 
@@ -31,7 +31,7 @@ Content-Type: application/json
   "direction": "up"
 }
 
-### Roboter "r1" move right
+### Robot "r1" move right
 POST {{host}}/robots/r1/move
 Content-Type: application/json
 
@@ -39,10 +39,10 @@ Content-Type: application/json
   "direction": "right" 
 }
 
-### Gegenstand "diamant" aufheben
+### Pick up item "diamant"
 POST {{host}}/robots/r1/pickup/diamant
 
-### Energie von "r1" patchen
+### Patch energy for "r1"
 PATCH {{host}}/robots/r1/state
 Content-Type: application/json
 
@@ -50,19 +50,19 @@ Content-Type: application/json
   "energy": 80
 }
 
-### Roboter "r1" gegen Roboter "r2" angreifen
+### Robot "r1" attacks robot "r2"
 POST {{host}}/robots/r1/attack/r2
 
 
-### 3. Paginierte Aktionen abrufen (Seite 1, Größe 2)
-# Wir rufen Seite 1 ab, mit nur 2 Elementen
+### 3. Get paginated actions (Page 1, Size 2)
+# Get page 1, with 2 items per page
 GET {{host}}/robots/r1/actions?page=1&size=2
 
-# ERWARTETE ANTWORT:
-# Du siehst die ersten beiden Aktionen ("Moved up", "Moved right")
-# "page.number" ist 1, "totalPages" ist 2 (da 4 Aktionen / 2 pro Seite)
-# "hasNext" ist true, "hasPrevious" ist false.
-# Es gibt einen "next" Link.
+# EXPECTED RESPONSE:
+# Shows the first two actions ("Moved up", "Moved right")
+# "page.number" is 1, "totalPages" is 2 (since 4 actions / 2 per page)
+# "hasNext" is true, "hasPrevious" is false.
+# A "next" link is present.
 #
 # {
 #   "page": {
@@ -100,21 +100,21 @@ GET {{host}}/robots/r1/actions?page=1&size=2
 # }
 
 
-### 4. Seite 2 abrufen
+### 4. Get page 2
 GET {{host}}/robots/r1/actions?page=2&size=2
 
-# ERWARTETE ANTWORT:
-# Die nächsten beiden Aktionen. "hasNext" ist false, "hasPrevious" ist true.
+# EXPECTED RESPONSE:
+# The next two actions. "hasNext" is false, "hasPrevious" is true.
 
 
-### 5. Einzelne Aktion über ihren "self" Link abrufen
+### 5. Get a single action via its "self" link
 GET {{host}}/robots/r1/actions/1
 
-# ERWARTETE ANTWORT:
-# Nur das JSON-Objekt für die Aktion mit ID 1.
+# EXPECTED RESPONSE:
+# Only the JSON object for the action with ID 1.
 
-### Status von "r2" prüfen (um den Angriff zu sehen)
+### Check status of "r2" (to see attack result)
 GET {{host}}/robots/r2/status
 
-### Test: Nicht existierenden Roboter abrufen (sollte 404 geben)
+### Test: Get non-existent robot (should return 404)
 GET {{host}}/robots/r99/status

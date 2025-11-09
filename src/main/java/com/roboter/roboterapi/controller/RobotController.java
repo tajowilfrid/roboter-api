@@ -29,30 +29,29 @@ public class RobotController {
     @Autowired
     private RobotService robotService;
 
-    // Helfer-Methode, um ein Optional<T> in eine HTTP-Antwort umzuwandeln
+    // Optional<T> in HTTP reponse
     private <T> ResponseEntity<T> toResponseEntity(Optional<T> optional) {
         return optional.map(ResponseEntity::ok)
                        .orElse(ResponseEntity.notFound().build());
     }
 
-    // Diese Methode fügt einem Roboter-Objekt die Standard-HATEOAS-Links hinzu
-    // und behebt den Bug, indem sie vorher alle alten Links entfernt.
+    // Add standard HATEOAS links to a Robot, fixing a bug by first clearing existing links
     @SuppressWarnings("null")
     private void addLinksToRobot(Robot robot) {
-        // Entfernt alle Links, bevor neue hinzugefügt werden
+        // Remove all links before adding new ones.
         robot.removeLinks(); 
         
-        // 1. "self" Link
+        // 1. "self" link
         robot.add(linkTo((Object) methodOn(RobotController.class)
             .getRobotStatus(robot.getId())).withSelfRel());
 
-        // 2. "actions" Link
+        // 2. "actions" link
         String actionsUri = linkTo((Object) methodOn(RobotController.class)
-            .getRobotActions(robot.getId(), 1, 5)) // Standard auf Seite 1, Größe 5
+            .getRobotActions(robot.getId(), 1, 5)) // standard on Seite 1, size 5
             .toUriComponentsBuilder()
             .build().toUriString();
         
-        // Wir verwenden page=1 (API-basiert) statt 0 (Spring-intern)
+        // Use page=1 (API-based) instead of 0 (Spring-internal)
         robot.add(Link.of(actionsUri.replace("page=0", "page=1"), "actions"));
     }
 
@@ -61,17 +60,17 @@ public class RobotController {
     @GetMapping("/{id}/status")
     public ResponseEntity<Robot> getRobotStatus(@PathVariable String id) {
         Optional<Robot> robotOpt = robotService.getRobotStatus(id);
-        // HATEOAS-Teil wird jetzt von der Helfermethode erledigt
+        // HATEOAS part is here handled by the helper method
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }
 
     // POST /robots/{id}/move
-    // @RequestBody wandelt das JSON der Anfrage in ein MoveRequest-Objekt um
+    // @RequestBody converts the JSON of the request into a MoveRequest object
     @PostMapping("/{id}/move")
     public ResponseEntity<Robot> moveRobot(@PathVariable String id, @RequestBody MoveRequest moveRequest) {
         Optional<Robot> robotOpt = robotService.moveRobot(id, moveRequest.getDirection());
-        // Fügt HATEOAS-Links auch zur POST-Antwort hinzu
+        // Add HATEOAS links to the POST response
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }
@@ -80,7 +79,6 @@ public class RobotController {
     @PostMapping("/{id}/pickup/{itemId}")
     public ResponseEntity<Robot> pickupItem(@PathVariable String id, @PathVariable String itemId) {
         Optional<Robot> robotOpt = robotService.pickupItem(id, itemId);
-        // Fügt HATEOAS-Links auch zur POST-Antwort hinzu
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }
@@ -89,7 +87,6 @@ public class RobotController {
     @PostMapping("/{id}/putdown/{itemId}")
     public ResponseEntity<Robot> putdownItem(@PathVariable String id, @PathVariable String itemId) {
         Optional<Robot> robotOpt = robotService.putdownItem(id, itemId);
-        // Fügt HATEOAS-Links auch zur POST-Antwort hinzu
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }
@@ -98,22 +95,21 @@ public class RobotController {
     @PatchMapping("/{id}/state")
     public ResponseEntity<Robot> patchRobotState(@PathVariable String id, @RequestBody PatchStateRequest patchRequest) {
         Optional<Robot> robotOpt = robotService.updateRobotState(id, patchRequest);
-        // Fügt HATEOAS-Links auch zur PATCH-Antwort hinzu
+        // Add HATEOAS links to the PATCH response
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }
 
 
-    // GET /robots/{id}/actions (Bugfix bei Paginierung-Link)
+    // GET /robots/{id}/actions
     @SuppressWarnings("null")
     @GetMapping("/{id}/actions")
     public ResponseEntity<PagedActionsResponse> getRobotActions(
             @PathVariable String id,
-            @RequestParam(defaultValue = "1") int page, // Standard auf 1
+            @RequestParam(defaultValue = "1") int page, // Standard on 1
             @RequestParam(defaultValue = "5") int size
     ) {
-        // Wir stellen sicher, dass die API 1-basiert ist
-        // Wenn der Benutzer 0 oder 1 sendet, meinen wir die erste Seite (Index 0)
+        // Ensure the API is 1-based and inputs 0 or 1 map to the first page (index 0)
         int pageNumber = Math.max(0, page - 1); 
         Pageable pageable = PageRequest.of(pageNumber, size);
 
@@ -126,10 +122,9 @@ public class RobotController {
         Page<RobotAction> actionsPage = pageOpt.get();
         PageInfo pageInfo = PageInfo.fromPage(actionsPage);
 
-        // 2. Füge "self" Links zu JEDER EINZELNEN Aktion hinzu
+        // Add "self" links to every single action
         List<RobotAction> actionsWithLinks = actionsPage.getContent().stream()
             .peek(action -> {
-                // Alte Links entfernen
                 action.removeLinks(); 
                 action.addLink(linkTo((Object) methodOn(RobotController.class)
                     .getRobotActionById(id, action.getId()))
@@ -137,10 +132,9 @@ public class RobotController {
             })
             .toList();
 
-        // 3. Erstelle "next" und "previous" Links für die Gesamt-Antwort
+        // Create "next" and "previous" links for the overall response
         List<Link> rootLinks = new ArrayList<>();
         
-        // Aktuelle Seite (API-basiert, z.B. 1)
         int currentPage = pageInfo.getNumber(); 
 
         rootLinks.add(linkTo((Object) methodOn(RobotController.class).getRobotActions(id, currentPage, size)).withSelfRel());
@@ -166,7 +160,6 @@ public class RobotController {
     public ResponseEntity<RobotAction> getRobotActionById(@PathVariable String id, @PathVariable long actionId) {
         Optional<RobotAction> actionOpt = robotService.getRobotActionById(id, actionId);
         actionOpt.ifPresent(action -> {
-            // Alte Links entfernen
             action.removeLinks(); 
             action.addLink(linkTo((Object) methodOn(RobotController.class)
                 .getRobotActionById(id, actionId))
@@ -179,7 +172,6 @@ public class RobotController {
     @PostMapping("/{id}/attack/{targetId}")
     public ResponseEntity<Robot> attackRobot(@PathVariable String id, @PathVariable String targetId) {
         Optional<Robot> robotOpt = robotService.attackRobot(id, targetId);
-        // Fügt HATEOAS-Links auch zur POST-Antwort hinzu
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }

@@ -8,28 +8,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component // Spring, bitte erstelle ein Objekt dieser Klasse beim Start
+@Component
 public class InMemoryRobotRepository {
 
-    // Unsere "Datenbank".
-    // Eine ConcurrentHashMap ist threadsicher, falls mehrere Anfragen gleichzeitig kommen.
-    // Wir speichern Roboter unter ihrer ID (String).
+    // Thread-safe Map to store Robots by String ID and handle concurrent access
     private final Map<String, Robot> robots = new ConcurrentHashMap<>();
 
-    // Speichert einen Roboter (neu oder Update)
+    // Saves a robot to the repository (new or updated)
     public Robot save(Robot robot) {
         robots.put(robot.getId(), robot);
         return robot;
     }
 
-    // Findet einen Roboter anhand seiner ID.
-    // Optional<Robot> ist ein Container, der entweder einen Roboter enthält ODER leer ist.
-    // Das hilft, "NullPointerExceptions" zu vermeiden.
+    // Finds a robot by its ID
+    // Optional<Robot> is a container that either contains a Robot or is empty and helps to avoid "NullPointerExceptions"
     public Optional<Robot> findById(String id) {
         return Optional.ofNullable(robots.get(id));
     }
 
-    // Gibt alle Roboter zurück (brauchen wir nicht für die Aufgabe, aber nützlich)
+    // Returns all robots in the repository
     public Collection<Robot> findAll() {
         return robots.values();
     }

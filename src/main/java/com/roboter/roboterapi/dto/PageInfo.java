@@ -5,20 +5,20 @@ import lombok.Data;
 import org.springframework.data.domain.Page;
 
 @Data
-@AllArgsConstructor // Erstellt einen Konstruktor mit allen Feldern
+@AllArgsConstructor
 public class PageInfo {
 
-    private int number;        // Aktuelle Seitenzahl (z.B. 1)
-    private int size;          // Elemente pro Seite (z.B. 5)
-    private long totalElements; // Gesamtzahl aller Aktionen (z.B. 20)
-    private int totalPages;    // Gesamtanzahl der Seiten (z.B. 4)
+    private int number;           // Current page number (e.g. 1)
+    private int size;            // Elements per page (e.g. 5)
+    private long totalElements; // Total number of all actions (e.g. 20)
+    private int totalPages;    // Total number of pages (e.g. 4)
     private boolean hasNext;
     private boolean hasPrevious;
 
-    // Hilfsmethode, um ein PageInfo-Objekt aus einem Spring "Page"-Objekt zu erstellen
+    // method to create a PageInfo object from a Spring Page object
     public static PageInfo fromPage(Page<?> page) {
         return new PageInfo(
-            page.getNumber() + 1, // Spring Page ist 0-basiert, die API soll 1-basiert sein
+            page.getNumber() + 1, // Spring Page is 0-based and the API is 1-based
             page.getSize(),
             page.getTotalElements(),
             page.getTotalPages(),

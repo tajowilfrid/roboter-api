@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// @Data (von Lombok) erstellt automatisch Getter, Setter, toString, etc.
-// @NoArgsConstructor erstellt einen leeren Konstruktor (wichtig für JSON)
-// @AllArgsConstructor erstellt einen Konstruktor mit allen Feldern
+/*
+ *@Data (from Lombok) automatically creates getters, setters, toString, etc.
+ *@NoArgsConstructor empty constructor for JSON
+ *@AllArgsConstructor all fields constructor 
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

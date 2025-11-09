@@ -7,43 +7,40 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-// 1. Erweitert RepresentationModel, damit die Klasse "_links" enthalten kann
-// 2. @EqualsAndHashCode(callSuper = false) ist wichtig, wenn man von RM erbt
-// @Data von Lombok erspart uns das Tippen von get/set-Methoden
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class Robot extends RepresentationModel<Robot> {
 
-    // Eindeutige ID des Roboters
+    // Unique ID of the robot
     private String id;
     
-    // Aktuelle Position, verwendet unsere Position-Klasse
+    // Current position using our Position class
     private Position position;
     
-    // Aktuelles Energielevel
+    // Current energy level
     private int energy;
     
-    // Das Inventar, wir speichern hier einfach die Item-IDs als Strings
+    // The inventory stores the item IDs as strings
     private List<String> inventory;
     
-    // Eine Liste aller Aktionen, die der Roboter durchgeführt hat
+    // A list of all actions the robot has performed
     // private List<String> actionHistory;
 
-    // 3. Geändert von List<String> zu List<RobotAction>
+    // From List<String> to List<RobotAction>
     private List<RobotAction> actionHistory;
 
-    // Konstruktor, um einen neuen Roboter mit Standardwerten zu erstellen
+    // Constructor to create a new robot with default values
     public Robot(String id) {
         this.id = id;
-        this.position = new Position(0, 0); // Startet bei (0,0)
-        this.energy = 100; // Startet mit voller Energie
+        this.position = new Position(0, 0); // Start at (0,0)
+        this.energy = 100; // Starts with full energy
         this.inventory = new ArrayList<>();
-        this.actionHistory = new ArrayList<>(); // initialisiert die neue Liste
+        this.actionHistory = new ArrayList<>(); // initializes the new list
     }
 
-    // 4. logAction wurde angepasst, um strukturierte Daten zu speichern
+    // logAction is been adapted to store structured data
     public void logAction(String action, String detail) {
-        // Erzeugt eine neue ID (1, 2, 3...)
+        // Creates a new ID (1, 2, 3...)
         long newId = this.actionHistory.isEmpty() ? 1 : 
                      this.actionHistory.get(this.actionHistory.size() - 1).getId() + 1;
         
@@ -52,9 +49,7 @@ public class Robot extends RepresentationModel<Robot> {
         );
     }
     
-    // HIER IST DER ZWEITE FIX:
-    // Diese Methode hat in Robot.java gefehlt und den Bug der
-    // doppelten Links in der /status-Antwort verursacht.
+    // method to remove all links from Robot to fix duplicate links bug
     @Override
     @org.springframework.lang.NonNull
     public Robot removeLinks() {

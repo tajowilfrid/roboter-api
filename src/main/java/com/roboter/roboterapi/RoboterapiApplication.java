@@ -15,18 +15,18 @@ public class RoboterapiApplication {
     }
 
     @Autowired
-    private RobotService robotService; // Wir holen uns den Service
+    private RobotService robotService;
 
-    // Ein "CommandLineRunner" ist Code, der direkt nach dem Start der App ausgeführt wird.
-    // Wir nutzen ihn, um unsere "Datenbank" mit Test-Robotern zu füllen.
+    // "CommandLineRunner" allows code to be executed directly after the application starts 
+	// and is used here to populate the database with test robots
     @Bean
     public CommandLineRunner createInitialRobots() {
         return args -> {
-            System.out.println("Erstelle Test-Roboter...");
+            System.out.println("Create Test-Roboter...");
             robotService.createRobot("r1");
             robotService.createRobot("r2");
             robotService.createRobot("r3");
-            System.out.println("Roboter r1, r2, r3 erstellt.");
+            System.out.println("Roboter r1, r2, r3 created.");
         };
     }
 }
