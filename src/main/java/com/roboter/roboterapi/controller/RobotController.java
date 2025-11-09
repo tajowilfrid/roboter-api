@@ -37,16 +37,17 @@ public class RobotController {
 
     // Diese Methode fügt einem Roboter-Objekt die Standard-HATEOAS-Links hinzu
     // und behebt den Bug, indem sie vorher alle alten Links entfernt.
+    @SuppressWarnings("null")
     private void addLinksToRobot(Robot robot) {
         // Entfernt alle Links, bevor neue hinzugefügt werden
         robot.removeLinks(); 
         
         // 1. "self" Link
-        robot.add(linkTo(methodOn(RobotController.class)
+        robot.add(linkTo((Object) methodOn(RobotController.class)
             .getRobotStatus(robot.getId())).withSelfRel());
 
         // 2. "actions" Link
-        String actionsUri = linkTo(methodOn(RobotController.class)
+        String actionsUri = linkTo((Object) methodOn(RobotController.class)
             .getRobotActions(robot.getId(), 1, 5)) // Standard auf Seite 1, Größe 5
             .toUriComponentsBuilder()
             .build().toUriString();
@@ -104,6 +105,7 @@ public class RobotController {
 
 
     // GET /robots/{id}/actions (Bugfix bei Paginierung-Link)
+    @SuppressWarnings("null")
     @GetMapping("/{id}/actions")
     public ResponseEntity<PagedActionsResponse> getRobotActions(
             @PathVariable String id,
@@ -129,7 +131,7 @@ public class RobotController {
             .peek(action -> {
                 // Alte Links entfernen
                 action.removeLinks(); 
-                action.addLink(linkTo(methodOn(RobotController.class)
+                action.addLink(linkTo((Object) methodOn(RobotController.class)
                     .getRobotActionById(id, action.getId()))
                     .withSelfRel());
             })
@@ -141,15 +143,15 @@ public class RobotController {
         // Aktuelle Seite (API-basiert, z.B. 1)
         int currentPage = pageInfo.getNumber(); 
 
-        rootLinks.add(linkTo(methodOn(RobotController.class).getRobotActions(id, currentPage, size)).withSelfRel());
+        rootLinks.add(linkTo((Object) methodOn(RobotController.class).getRobotActions(id, currentPage, size)).withSelfRel());
 
         if (actionsPage.hasNext()) {
-            rootLinks.add(linkTo(methodOn(RobotController.class)
+            rootLinks.add(linkTo((Object) methodOn(RobotController.class)
                 .getRobotActions(id, currentPage + 1, size))
                 .withRel("next"));
         }
         if (actionsPage.hasPrevious()) {
-            rootLinks.add(linkTo(methodOn(RobotController.class)
+            rootLinks.add(linkTo((Object) methodOn(RobotController.class)
                 .getRobotActions(id, currentPage - 1, size))
                 .withRel("previous"));
         }
@@ -159,13 +161,14 @@ public class RobotController {
     }
 
     // GET /robots/{id}/actions/{actionId}
+    @SuppressWarnings("null")
     @GetMapping("/{id}/actions/{actionId}")
     public ResponseEntity<RobotAction> getRobotActionById(@PathVariable String id, @PathVariable long actionId) {
         Optional<RobotAction> actionOpt = robotService.getRobotActionById(id, actionId);
         actionOpt.ifPresent(action -> {
             // Alte Links entfernen
             action.removeLinks(); 
-            action.addLink(linkTo(methodOn(RobotController.class)
+            action.addLink(linkTo((Object) methodOn(RobotController.class)
                 .getRobotActionById(id, actionId))
                 .withSelfRel());
         });
