@@ -2,12 +2,28 @@
 # Wenn du deinen Port änderst, musst du es nur hier tun.
 @host = http://localhost:8090
 
-
-### 1. Status von Roboter "r1" abrufen
+### 1. Status von Roboter "r1" abrufen (mit HATEOAS Links)
 # @name testGetStatus
 GET {{host}}/robots/r1/status
 
-### 2. Roboter "r1" bewegen (up)
+# ERWARTETE ANTWORT:
+# Das JSON enthält jetzt ein "_links" Feld, das auf "self" und "actions" zeigt:
+#
+# {
+#   "id": "r1",
+#   "position": { "x": 0, "y": 0 },
+#   "energy": 100,
+#   "inventory": [],
+#   "actionHistory": [],
+#   "_links": {
+#     "self": { "href": "http://localhost:8090/robots/r1/status" },
+#     "actions": { "href": "http://localhost:8090/robots/r1/actions?page=0&size=5" }
+#   }
+# }
+
+
+### 2. Ein paar Aktionen generieren (4x bewegen)
+### Roboter "r1" move up
 POST {{host}}/robots/r1/move
 Content-Type: application/json
 
@@ -15,10 +31,18 @@ Content-Type: application/json
   "direction": "up"
 }
 
-### 3. Gegenstand "diamant" aufheben
+### Roboter "r1" move right
+POST {{host}}/robots/r1/move
+Content-Type: application/json
+
+{
+  "direction": "right" 
+}
+
+### Gegenstand "diamant" aufheben
 POST {{host}}/robots/r1/pickup/diamant
 
-### 4. Energie von "r1" patchen
+### Energie von "r1" patchen
 PATCH {{host}}/robots/r1/state
 Content-Type: application/json
 
@@ -26,25 +50,71 @@ Content-Type: application/json
   "energy": 80
 }
 
-### 5. Position von "r1" patchen (alternativer Patch)
-PATCH {{host}}/robots/r1/state
-Content-Type: application/json
-
-{
-  "position": {
-    "x": 10,
-    "y": 20
-  }
-}
-
-### 6. Aktionen von "r1" abrufen
-GET {{host}}/robots/r1/actions
-
-### 7. Roboter "r1" greift "r2" an
+### Roboter "r1" gegen Roboter "r2" angreifen
 POST {{host}}/robots/r1/attack/r2
 
-### 8. Status von "r2" prüfen (um den Angriff zu sehen)
+
+### 3. Paginierte Aktionen abrufen (Seite 1, Größe 2)
+# Wir rufen Seite 1 ab, mit nur 2 Elementen
+GET {{host}}/robots/r1/actions?page=1&size=2
+
+# ERWARTETE ANTWORT:
+# Du siehst die ersten beiden Aktionen ("Moved up", "Moved right")
+# "page.number" ist 1, "totalPages" ist 2 (da 4 Aktionen / 2 pro Seite)
+# "hasNext" ist true, "hasPrevious" ist false.
+# Es gibt einen "next" Link.
+#
+# {
+#   "page": {
+#     "number": 1,
+#     "size": 2,
+#     "totalElements": 4,
+#     "totalPages": 2,
+#     "hasNext": true,
+#     "hasPrevious": false
+#   },
+#   "actions": [
+#     {
+#       "id": 1,
+#       "action": "Moved",
+#       "detail": "up",
+#       "timestamp": "...",
+#       "links": [
+#         { "rel": "self", "href": "http://localhost:8090/robots/r1/actions/1" }
+#       ]
+#     },
+#     {
+#       "id": 2,
+#       "action": "Moved",
+#       "detail": "right",
+#       "timestamp": "...",
+#       "links": [
+#         { "rel": "self", "href": "http://localhost:8090/robots/r1/actions/2" }
+#       ]
+#     }
+#   ],
+#   "links": [
+#     { "rel": "self", "href": "http://localhost:8090/robots/r1/actions?page=1&size=2" },
+#     { "rel": "next", "href": "http://localhost:8090/robots/r1/actions?page=2&size=2" }
+#   ]
+# }
+
+
+### 4. Seite 2 abrufen
+GET {{host}}/robots/r1/actions?page=2&size=2
+
+# ERWARTETE ANTWORT:
+# Die nächsten beiden Aktionen. "hasNext" ist false, "hasPrevious" ist true.
+
+
+### 5. Einzelne Aktion über ihren "self" Link abrufen
+GET {{host}}/robots/r1/actions/1
+
+# ERWARTETE ANTWORT:
+# Nur das JSON-Objekt für die Aktion mit ID 1.
+
+### Status von "r2" prüfen (um den Angriff zu sehen)
 GET {{host}}/robots/r2/status
 
-### 9. Test: Nicht existierenden Roboter abrufen (sollte 404 geben)
+### Test: Nicht existierenden Roboter abrufen (sollte 404 geben)
 GET {{host}}/robots/r99/status
