@@ -1,0 +1,10 @@
+services:
+  roboterapi:
+    container_name: roboterapi-container
+    build: .
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
+    environment:
+      # JVM memory settings to optimize for containerized environments
+      - JAVA_OPTS=-XX:MaxRAMPercentage=75.0
