@@ -1,40 +1,58 @@
-# 🤖 Roboter-API (Spring Boot)
+# Roboter-API (Spring Boot)
 
-Dies ist ein Spring Boot-Projekt, das eine HATEOAS-konforme REST-API zur Steuerung von virtuellen Robotern bereitstellt. Das Projekt demonstriert modernes API-Design, Paginierung, automatisierte Tests sowie Containerisierung und Cloud-Deployment.
+Dies ist ein Spring Boot-Projekt, das eine HATEOAS-konforme REST-API zur Steuerung von virtuellen Robotern bereitstellt. Das Projekt demonstriert modernes API-Design, Paginierung, automatisierte Tests sowie eine vollständige CI/CD-Pipeline mit GitLab und Google Cloud Run.
 
-## ✨ Features
+##  Schnellstart
 
-  * **RESTful API:** Sauberes Ressourcen-Design.
-  * **HATEOAS:** Hypermedia-Links (`_links`) zur besseren Navigierbarkeit.
-  * **Paginierung:** Effizienter Abruf von Listen (Aktions-Historie).
-  * **Dockerized:** Multi-Stage Dockerfile für optimierte Images.
-  * **Cloud Ready:** Vorbereitet für Google Cloud Run.
+Um das Projekt lokal einzurichten, klonen Sie das Repository:
+
+```bash
+# Über SSH
+git clone git@gitlab.com:tajowilfrid/roboter-api.git
+
+# Oder über HTTPS
+git clone https://gitlab.com/tajowilfrid/roboter-api.git
+
+cd roboter-api
+```
 
 -----
 
-## 📋 Voraussetzungen
+## Features
 
-Um dieses Projekt lokal auszuführen oder zu deployen, wird folgende Software benötigt:
+  * **RESTful API:** Sauberes Ressourcen-Design für Roboter-Interaktionen.
+  * **HATEOAS:** Hypermedia-Links (`_links`) zur besseren Navigierbarkeit der API.
+  * **Paginierung:** Effizienter Abruf von Listen (z.B. Aktions-Historie).
+  * **Dockerized:** Optimiertes Multi-Stage Dockerfile für kleine und sichere Images.
+  * **CI/CD Pipeline:** Vollautomatisches Build, Test und Deployment auf Google Cloud Run via GitLab CI.
+
+-----
+
+## Voraussetzungen
+
+Für die lokale Entwicklung und Ausführung benötigen Sie:
 
   * **Java JDK 21** (LTS)
   * **Apache Maven** 3.8+
   * **Docker** (für Containerisierung)
-  * **Google Cloud CLI** (für das Deployment)
   * **VS Code** (empfohlen) mit dem *Extension Pack for Java*
+  * **Google Cloud CLI** (für manuelles Deployment)
 
 -----
 
-## 🚀 Anwendung lokal starten (Entwicklung)
+## Anwendung lokal ausführen
 
 Die Anwendung ist standardmäßig so konfiguriert, dass sie auf Port `8090` läuft.
 
-### Option 1: Über VS Code
+### Option 1: Über VS Code (Empfohlen)
 
 1.  Öffnen Sie das Projektverzeichnis in Visual Studio Code.
 2.  Öffnen Sie die **Spring Boot Dashboard**-Ansicht (linke Leiste).
 3.  Klicken Sie beim Projekt `roboterapi` auf den **Start**-Pfeil.
 
 ### Option 2: Über das Terminal
+
+Nutzen Sie den mitgelieferten Maven Wrapper für ein konsistentes Build-Erlebnis:
 
 ```bash
 ./mvnw spring-boot:run
@@ -44,14 +62,12 @@ Die API ist anschließend erreichbar unter: `http://localhost:8090/robots/r1/sta
 
 -----
 
-## 🐳 Docker (Containerisierung)
+## Docker
 
-Das Projekt enthält ein `Dockerfile` (Multi-Stage Build), das ein schlankes Image auf Basis von `eclipse-temurin:21-jre` erstellt.
+Das Projekt nutzt ein **Multi-Stage Dockerfile**, das den Build-Prozess vom Laufzeit-Image trennt. Das Ergebnis ist ein schlankes Image auf Basis von `eclipse-temurin:21-jre`.
 
 ### Image bauen
-
 *Hinweis für Mac mit M1/M2 (Apple Silicon): Nutzen Sie das `--platform` Flag für Kompatibilität mit Cloud-Servern.*
-
 ```bash
 # Standard Build
 docker build -t roboterapi-image .
@@ -62,7 +78,7 @@ docker build --platform linux/amd64 --no-cache -t roboterapi-image .
 
 ### Container starten
 
-Wir mappen den Container-Port (Standard 8080) auf den lokalen Port 8090.
+Der Container-Port (Standard 8080) wird auf den lokalen Port 8090 gemappt.
 
 ```bash
 docker run --rm -p 8090:8080 \
@@ -73,48 +89,45 @@ docker run --rm -p 8090:8080 \
 
 -----
 
-## ☁️ Deployment (Google Cloud Run)
+## CI/CD & Cloud Deployment
 
-Das Deployment erfolgt Serverless auf Google Cloud Run.
+Das Projekt verfügt über eine `.gitlab-ci.yml` Pipeline, die bei jedem Push auf den `main`-Branch automatisch ausgeführt wird.
 
-### 1\. Vorbereitung & Login
+**Phasen der Pipeline:**
+
+1.  **Build:** Kompiliert den Java-Code.
+2.  **Test:** Führt Unit- und Integrationstests aus.
+3.  **Deploy:** Baut das Docker-Image, lädt es in die **Google Artifact Registry** und deployt den Service auf **Google Cloud Run**.
+
+### Manuelles Deployment (Optional)
+
+Falls Sie manuell deployen möchten:
 
 ```bash
+# 1. Login & Konfiguration
 gcloud auth login
-gcloud config set project [DEINE_PROJECT_ID]
-gcloud auth configure-docker
-```
+gcloud config set project [IHR_PROJEKT_ID]
+gcloud auth configure-docker europe-west1-docker.pkg.dev
 
-### 2\. Image taggen & pushen
+# 2. Build & Push
+docker build --platform linux/amd64 -t europe-west1-docker.pkg.dev/[IHR_PROJEKT_ID]/roboter-repo/roboterapi-image .
+docker push europe-west1-docker.pkg.dev/[IHR_PROJEKT_ID]/roboter-repo/roboterapi-image
 
-```bash
-# Image für Google Registry taggen
-docker tag roboterapi-image gcr.io/[DEINE_PROJECT_ID]/roboterapi-image
-
-# Image hochladen
-docker push gcr.io/[DEINE_PROJECT_ID]/roboterapi-image
-```
-
-### 3\. Service starten
-
-```bash
+# 3. Deploy
 gcloud run deploy roboter-service \
-  --image gcr.io/[DEINE_PROJECT_ID]/roboterapi-image \
+  --image europe-west1-docker.pkg.dev/[IHR_PROJEKT_ID]/roboter-repo/roboterapi-image \
   --platform managed \
   --region europe-west1 \
   --allow-unauthenticated
 ```
 
-Nach erfolgreichem Deployment wird die Service-URL in der Konsole ausgegeben.
-
 -----
 
-## 🧪 Tests
+## Tests
 
 ### Automatisierte Tests
 
-Das Projekt nutzt `JUnit 5` und `MockMvc` für Web-Layer-Tests (Slice Tests).
-
+Das Projekt nutzt `JUnit 5` und `MockMvc` für effiziente Web-Layer-Tests (Slice Tests).
 Ausführung über Terminal:
 
 ```bash
@@ -123,11 +136,11 @@ Ausführung über Terminal:
 
 ### Manuelle Tests
 
-Für manuelle API-Calls liegt die Datei `api-tests.http` im Projektverzeichnis. Diese kann mit der VS Code Extension "REST Client" ausgeführt werden.
+Für manuelle API-Calls liegt die Datei `api-tests.http` im Projektverzeichnis bereit. Diese kann mit der VS Code Extension "REST Client" ausgeführt werden.
 
 -----
 
-## 📡 API-Endpunkte
+## API-Endpunkte
 
 Die API stellt folgende Endpunkte zur Steuerung der Roboter (Standard: `r1`, `r2`, `r3`) bereit:
 
