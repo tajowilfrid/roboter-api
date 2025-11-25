@@ -10,7 +10,7 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  IMAGE_NAME: "gcr.io/$GCP_PROJECT_ID/roboterapi-image"
+  IMAGE_NAME: "europe-west1-docker.pkg.dev/$GCP_PROJECT_ID/roboter-repo/roboterapi-image"
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
 
@@ -45,8 +45,8 @@ deploy_to_cloud_run:
     - gcloud auth activate-service-account --key-file gcloud-service-key.json
     - gcloud config set project $GCP_PROJECT_ID
 
-    - echo "Configure Docker for GCR..."
-    - echo "y" | gcloud auth configure-docker
+    - echo "Configure Docker for Artifact Registry..."
+    - gcloud auth configure-docker europe-west1-docker.pkg.dev
 
     - echo "Baue Docker Image..."
     - docker build --platform linux/amd64 -t $IMAGE_NAME .
