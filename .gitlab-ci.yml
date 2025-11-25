@@ -1,0 +1,57 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  IMAGE_NAME: "gcr.io/$GCP_PROJECT_ID/roboterapi-image"
+
+cache:
+  paths:
+    - .m2/repository
+
+maven_build:
+  image: maven:3.9.9-eclipse-temurin-21
+  stage: build
+  script:
+    - echo "Starte Kompilierung..."
+    - mvn compile
+
+maven_test:
+  image: maven:3.9.9-eclipse-temurin-21
+  stage: test
+  script:
+    - echo "Run tests..."
+    - mvn test
+
+deploy_to_cloud_run:
+  stage: deploy
+  image: google/cloud-sdk:latest
+  services:
+    - docker:dind
+  script:
+    - echo "Authentication with Google Cloud..."
+    - echo $GCP_SERVICE_KEY > gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file gcloud-service-key.json
+    - gcloud config set project $GCP_PROJECT_ID
+
+    - echo "Configure Docker for GCR..."
+    - gcloud auth configure-docker
+
+    - echo "Baue Docker Image..."
+    - docker build --platform linux/amd64 -t $IMAGE_NAME .
+
+    - echo "Pushe Image in the registry..."
+    - docker push $IMAGE_NAME
+
+    - echo "Deploye to Cloud Run..."
+    - gcloud run deploy $SERVICE_NAME --image $IMAGE_NAME --platform managed --region $GCP_REGION --allow-unauthenticated
+  
+  only:
+    - main

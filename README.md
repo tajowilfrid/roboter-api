@@ -1,75 +1,142 @@
 # 🤖 Roboter-API (Spring Boot)
 
-Dies ist ein Spring Boot-Projekt, das eine HATEOAS-konforme REST-API zur Steuerung von virtuellen Robotern bereitstellt. Das Projekt wurde im Rahmen einer Übung erstellt und umfasst API-Design, Paginierung und automatisierte Tests.
+Dies ist ein Spring Boot-Projekt, das eine HATEOAS-konforme REST-API zur Steuerung von virtuellen Robotern bereitstellt. Das Projekt demonstriert modernes API-Design, Paginierung, automatisierte Tests sowie Containerisierung und Cloud-Deployment.
 
----
+## ✨ Features
+
+  * **RESTful API:** Sauberes Ressourcen-Design.
+  * **HATEOAS:** Hypermedia-Links (`_links`) zur besseren Navigierbarkeit.
+  * **Paginierung:** Effizienter Abruf von Listen (Aktions-Historie).
+  * **Dockerized:** Multi-Stage Dockerfile für optimierte Images.
+  * **Cloud Ready:** Vorbereitet für Google Cloud Run.
+
+-----
 
 ## 📋 Voraussetzungen
 
-Um dieses Projekt auszuführen, wird folgende Software benötigt:
+Um dieses Projekt lokal auszuführen oder zu deployen, wird folgende Software benötigt:
 
-* **Java JDK 21** (oder neuer)
-* **Apache Maven** 3.8+
-* **VS Code** (empfohlen) mit dem **Extension Pack for Java**
-* (Optional) **REST Client** VS Code Extension (zum Testen der `api-tests.http`-Datei)
+  * **Java JDK 21** (LTS)
+  * **Apache Maven** 3.8+
+  * **Docker** (für Containerisierung)
+  * **Google Cloud CLI** (für das Deployment)
+  * **VS Code** (empfohlen) mit dem *Extension Pack for Java*
 
----
+-----
 
-## Anwendung starten
+## 🚀 Anwendung lokal starten (Entwicklung)
 
-Die Anwendung ist so konfiguriert, dass sie auf Port `8090` läuft.
+Die Anwendung ist standardmäßig so konfiguriert, dass sie auf Port `8090` läuft.
 
-### Option 1: Über VS Code (Empfohlen)
+### Option 1: Über VS Code
 
-1.  Öffne das Projektverzeichnis in Visual Studio Code.
-2.  Warte, bis die Java-Erweiterungen das Projekt geladen haben.
-3.  Öffne die "Spring Boot Dashboard"-Ansicht (Sechseck-Icon in der linken Leiste).
-4.  Finde das `roboterapi`-Projekt und klicke auf das "Start"-Symbol (Play-Button).
-5.  Die API läuft, sobald im Terminal "Started RoboterapiApplication..." und "Tomcat started on port(s): 8090" erscheint.
+1.  Öffnen Sie das Projektverzeichnis in Visual Studio Code.
+2.  Öffnen Sie die **Spring Boot Dashboard**-Ansicht (linke Leiste).
+3.  Klicken Sie beim Projekt `roboterapi` auf den **Start**-Pfeil.
 
-### Option 2: Über das Terminal (Maven Wrapper)
+### Option 2: Über das Terminal
 
-1.  Öffne ein Terminal im Projekt-Hauptverzeichnis (`roboterapi/`).
-2.  Führe den Maven Wrapper aus:
-    ```bash
-    ./mvnw spring-boot:run
-    ```
-3.  Die API läuft auf `http://localhost:8090`.
+```bash
+./mvnw spring-boot:run
+```
 
----
+Die API ist anschließend erreichbar unter: `http://localhost:8090/robots/r1/status`
 
-## Testen der API
+-----
 
-Das Projekt enthält sowohl automatisierte Tests als auch eine Datei für manuelle Anfragen.
+## 🐳 Docker (Containerisierung)
 
-### 1. Automatisierte Tests (Slice Tests)
+Das Projekt enthält ein `Dockerfile` (Multi-Stage Build), das ein schlankes Image auf Basis von `eclipse-temurin:21-jre` erstellt.
 
-Die Tests überprüfen die Controller-Schicht und mocken den Service.
+### Image bauen
 
-1.  Öffne die Datei `src/test/java/com/roboter/roboterapi/controller/RobotControllerTest.java` in VS Code.
-2.  Klicke auf das "Play"-Symbol neben dem Klassennamen `RobotControllerTest`, um alle Tests auszuführen.
-3.  Die Ergebnisse werden im Tab "Test Runner for Java" angezeigt (alle Tests sollten grün sein).
+*Hinweis für Mac mit M1/M2 (Apple Silicon): Nutzen Sie das `--platform` Flag für Kompatibilität mit Cloud-Servern.*
 
-### 2. Manuelle Endpunkt-Tests (REST Client)
+```bash
+# Standard Build
+docker build -t roboterapi-image .
 
-Für manuelle Tests mit einem "echten" Server:
+# Build für Cloud Deployment (Linux AMD64) auf einem M1/M2 Mac
+docker build --platform linux/amd64 --no-cache -t roboterapi-image .
+```
 
-1.  Stelle sicher, dass die Anwendung läuft (siehe "Anwendung starten").
-2.  Öffne die Datei `api-tests.http` in VS Code.
-3.  Klicke auf den `Send Request`-Link über einer beliebigen HTTP-Anfrage, um diese an die laufende Anwendung zu senden. Die Antwort erscheint in einem neuen Fenster.
+### Container starten
 
----
+Wir mappen den Container-Port (Standard 8080) auf den lokalen Port 8090.
 
-## API-Endpunkte
+```bash
+docker run --rm -p 8090:8080 \
+  -e PORT=8080 \
+  --name roboter-container \
+  roboterapi-image
+```
 
-Die API stellt die folgenden Endpunkte zur Steuerung der Roboter `r1`, `r2` und `r3` (Standard-Roboter) bereit.
+-----
 
-| Methode | URL | Beschreibung | Body (Beispiel) |
+## ☁️ Deployment (Google Cloud Run)
+
+Das Deployment erfolgt Serverless auf Google Cloud Run.
+
+### 1\. Vorbereitung & Login
+
+```bash
+gcloud auth login
+gcloud config set project [DEINE_PROJECT_ID]
+gcloud auth configure-docker
+```
+
+### 2\. Image taggen & pushen
+
+```bash
+# Image für Google Registry taggen
+docker tag roboterapi-image gcr.io/[DEINE_PROJECT_ID]/roboterapi-image
+
+# Image hochladen
+docker push gcr.io/[DEINE_PROJECT_ID]/roboterapi-image
+```
+
+### 3\. Service starten
+
+```bash
+gcloud run deploy roboter-service \
+  --image gcr.io/[DEINE_PROJECT_ID]/roboterapi-image \
+  --platform managed \
+  --region europe-west1 \
+  --allow-unauthenticated
+```
+
+Nach erfolgreichem Deployment wird die Service-URL in der Konsole ausgegeben.
+
+-----
+
+## 🧪 Tests
+
+### Automatisierte Tests
+
+Das Projekt nutzt `JUnit 5` und `MockMvc` für Web-Layer-Tests (Slice Tests).
+
+Ausführung über Terminal:
+
+```bash
+./mvnw test
+```
+
+### Manuelle Tests
+
+Für manuelle API-Calls liegt die Datei `api-tests.http` im Projektverzeichnis. Diese kann mit der VS Code Extension "REST Client" ausgeführt werden.
+
+-----
+
+## 📡 API-Endpunkte
+
+Die API stellt folgende Endpunkte zur Steuerung der Roboter (Standard: `r1`, `r2`, `r3`) bereit:
+
+| Methode | URL | Beschreibung | Beispiel-Body |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/robots/{id}/status` | Ruft den Status (inkl. `_links`) eines Roboters ab. | |
-| `POST` | `/robots/{id}/move` | Bewegt einen Roboter. | `{"direction": "up"}` |
-| `POST` | `/robots/{id}/pickup/{itemId}` | Roboter hebt einen Gegenstand auf. | |
-| `POST` | `/robots/{id}/putdown/{itemId}` | Roboter legt einen Gegenstand ab. | |
-| `PATCH` | `/robots/{id}/state` | Aktualisiert Energie oder Position. | `{"energy": 80}` |
-| `GET` | `/robots/{id}/actions` | Ruft Aktionen paginiert ab (z.B. `?page=1&size=2`). | |
-| `POST` | `/robots/{id}/attack/{targetId}` | Lässt einen Roboter einen anderen angreifen. | |
+| `GET` | `/robots/{id}/status` | Ruft Status inkl. HATEOAS-Links ab. | - |
+| `POST` | `/robots/{id}/move` | Bewegt den Roboter. | `{"direction": "up"}` |
+| `POST` | `/robots/{id}/pickup/{itemId}` | Hebt einen Gegenstand auf. | - |
+| `POST` | `/robots/{id}/putdown/{itemId}` | Legt einen Gegenstand ab. | - |
+| `PATCH` | `/robots/{id}/state` | Aktualisiert Energie/Position. | `{"energy": 80}` |
+| `GET` | `/robots/{id}/actions` | Ruft Aktionen paginiert ab. | *Query:* `?page=1&size=5` |
+| `POST` | `/robots/{id}/attack/{targetId}` | Greift einen anderen Roboter an. | - |
