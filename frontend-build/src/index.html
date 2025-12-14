@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Mission Control System</title>
+    
+    <link rel="icon" href="data:,">
+
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #0b1120;
+            font-family: 'Segoe UI', sans-serif; 
+        }
+
+        main { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+    </style>
+</head>
+<body>
+
+    <header-view></header-view>
+
+    <main id="view"></main>
+
+    <script type="module">
+        // 1. Import all Web Components so the browser registers the custom tags
+        import './js/components/HeaderView.js';
+        import './js/components/ContentViewControl.js';
+        import './js/components/ContentViewLog.js';
+        import './js/components/ContentViewApiTest.js';
+        import './js/components/ContentViewSettings.js';
+        import './js/components/ContentViewAbout.js';
+        
+        // 2. Import the Router Utility
+        import { showView } from './js/utils/DOMUtils.js';
+
+        window.showView = showView;
+
+        showView('content-view-control');
+    </script>
+</body>
+</html>

@@ -6,6 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class RoboterapiApplication {
@@ -27,6 +29,18 @@ public class RoboterapiApplication {
             robotService.createRobot("r2");
             robotService.createRobot("r3");
             System.out.println("Roboter r1, r2, r3 created.");
+        };
+    }
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                // Allow all origins for all endpoints
+                registry.addMapping("/**")
+                        .allowedOrigins("*") 
+                        .allowedMethods("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS");
+            }
         };
     }
 }

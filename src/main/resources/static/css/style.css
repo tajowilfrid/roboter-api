@@ -1,0 +1,249 @@
+/*
+   GLOBAL THEME & VARIABLES
+*/
+:host {
+    /* Background Colors */
+    --bg-main: #0b1120;
+    --bg-card: #1e293b;
+    --bg-input: #0f172a;
+
+    /* Text Colors */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+
+    /* Accent & Status Colors */
+    --accent-cyan: #06b6d4;
+    --accent-pink: #ec4899;
+    --status-success: #10b981;
+    --status-danger: #ef4444;
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    /* Typography */
+    --font-family: 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Component Defaults */
+    display: block;
+    font-family: var(--font-family);
+    color: var(--text-primary);
+}
+
+/*
+   LAYOUT UTILITIES
+*/
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1.5rem;
+}
+
+/* Flexbox Helpers */
+.flex-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
+/* Grid Helpers */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Spacing Helpers */
+.mt-1 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 1rem; }
+
+/*
+   TYPOGRAPHY
+*/
+h2 {
+    color: var(--accent-pink);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+h3 {
+    color: var(--accent-cyan);
+    font-size: 1rem;
+    margin: 1rem 0 0.5rem;
+}
+
+p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 1rem;
+}
+
+.mono {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+/*
+   FORMS & CONTROLS
+*/
+.input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 12px;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+}
+
+/* Buttons */
+.btn {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn:hover:not(:disabled) {
+    background: var(--accent-cyan);
+    color: var(--bg-main);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+    background: transparent;
+}
+
+.btn.secondary {
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+    background: transparent;
+}
+
+.btn.secondary:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+/*
+   5. SPECIFIC COMPONENT STYLES
+*/
+
+/* Data Box (for Control View) */
+.data-box {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-cyan);
+}
+
+.data-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.data-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    font-family: var(--font-mono);
+}
+
+/* Control Pad */
+.control-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    gap: 10px;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.btn-ctrl {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    padding: 0;
+}
+
+.btn-ctrl svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+/* Log Console */
+.console-log {
+    background: #000;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--status-success);
+    height: 150px;
+    overflow-y: auto;
+}
+
+/* API Endpoint List */
+.endpoint-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--text-secondary);
+    padding: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.method {
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+.method.GET {
+    background: rgba(6, 182, 212, 0.2);
+    color: var(--accent-cyan);
+}
+
+.method.POST {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--status-success);
+}
+
+.method.PATCH {
+    background: rgba(236, 72, 153, 0.2);
+    color: var(--accent-pink);
+}

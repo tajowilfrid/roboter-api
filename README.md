@@ -46,13 +46,13 @@ Die Anwendung ist standardmäßig so konfiguriert, dass sie auf Port `8090` läu
 
 ### Option 1: Über VS Code (Empfohlen)
 
-1.  Öffnen Sie das Projektverzeichnis in Visual Studio Code.
-2.  Öffnen Sie die **Spring Boot Dashboard**-Ansicht (linke Leiste).
-3.  Klicken Sie beim Projekt `roboterapi` auf den **Start**-Pfeil.
+1.  Öffne das Projektverzeichnis in Visual Studio Code.
+2.  Öffne die **Spring Boot Dashboard**-Ansicht (linke Leiste).
+3.  Klicke beim Projekt `roboterapi` auf den **Start**-Pfeil.
 
 ### Option 2: Über das Terminal
 
-Nutzen Sie den mitgelieferten Maven Wrapper für ein konsistentes Build-Erlebnis:
+Nutze den mitgelieferten Maven Wrapper für ein konsistentes Build-Erlebnis:
 
 ```bash
 ./mvnw spring-boot:run
@@ -67,7 +67,7 @@ Die API ist anschließend erreichbar unter: `http://localhost:8090/robots/r1/sta
 Das Projekt nutzt ein **Multi-Stage Dockerfile**, das den Build-Prozess vom Laufzeit-Image trennt. Das Ergebnis ist ein schlankes Image auf Basis von `eclipse-temurin:21-jre`.
 
 ### Image bauen
-*Hinweis für Mac mit M1/M2 (Apple Silicon): Nutzen Sie das `--platform` Flag für Kompatibilität mit Cloud-Servern.*
+*Hinweis für Mac mit M1/M2 (Apple Silicon): Nutze das `--platform` Flag für Kompatibilität mit Cloud-Servern.*
 ```bash
 # Standard Build
 docker build -t roboterapi-image .
@@ -101,7 +101,7 @@ Das Projekt verfügt über eine `.gitlab-ci.yml` Pipeline, die bei jedem Push au
 
 ### Manuelles Deployment (Optional)
 
-Falls Sie manuell deployen möchten:
+Falls man manuell deployen möchte:
 
 ```bash
 # 1. Login & Konfiguration

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot System - Integration Demo</title>
+    
+    <style>
+        /* * Host Page Styling 
+         * This simulates a customer's website where we embed zhe components.
+         */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #f3f4f6;
+            color: #333;
+            padding: 40px; 
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        p.description {
+            margin-bottom: 30px;
+            color: #6b7280;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .integration-box { 
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            
+            background-color: #0b1120;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 1px solid #374151;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Integration Test</h1>
+    <p class="description">
+        This page simulates a 3rd-party website loading the bundled Web Components 
+        directly from the Google Cloud CDN.
+    </p>
+
+    <div class="integration-box">
+        <header-view></header-view>
+        
+        <div id="view"></div>
+    </div>
+
+    <script type="module" src="https://storage.googleapis.com/roboter-frontend-assets/robot-components.es.js"></script>
+
+    <script>
+        /**
+         * Initialization Script
+         * We need to wait until the external module is fully loaded and executed.
+         */
+        window.addEventListener('load', () => {
+            
+            // Check if our global entry point exists (defined in main.js / vite config)
+            if (window.RobotSystem && typeof window.RobotSystem.showView === 'function') {
+                
+                console.log("Cloud Bundle loaded successfully.");
+                
+                // Initialize the app by showing the control view
+                window.RobotSystem.showView('content-view-control');
+                
+            } else {
+                console.error("Failed to load RobotSystem. Check the cloud URL or bundle export.");
+            }
+
+        });
+    </script>
+
+</body>
+</html>
