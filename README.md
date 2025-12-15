@@ -18,8 +18,6 @@ git clone https://gitlab.com/tajowilfrid/roboter-api.git
 cd roboter-api
 ```
 
-**Live Demo:** [https://roboter-service-820842100826.europe-west1.run.app/](https://roboter-service-820842100826.europe-west1.run.app/)
-
 -----
 
 ## Features
