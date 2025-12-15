@@ -123,4 +123,5 @@ class HeaderView extends HTMLElement {
     }
 }
 
-customElements.define('header-view', HeaderView);
+if(customElements.get('header-view')===undefined)
+    customElements.define('header-view', HeaderView);

@@ -8,10 +8,10 @@ import org.springframework.data.domain.Page;
 @AllArgsConstructor
 public class PageInfo {
 
-    private int number;           // Current page number (e.g. 1)
-    private int size;            // Elements per page (e.g. 5)
-    private long totalElements; // Total number of all actions (e.g. 20)
-    private int totalPages;    // Total number of pages (e.g. 4)
+    private int number;
+    private int size;
+    private long totalElements;
+    private int totalPages;
     private boolean hasNext;
     private boolean hasPrevious;
 

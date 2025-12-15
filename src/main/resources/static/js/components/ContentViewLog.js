@@ -124,4 +124,5 @@ class ContentViewLog extends HTMLElement {
     }
 }
 
-customElements.define('content-view-log', ContentViewLog);
+if(customElements.get('content-view-log')===undefined)
+    customElements.define('content-view-log', ContentViewLog);

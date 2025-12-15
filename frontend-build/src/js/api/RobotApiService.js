@@ -16,7 +16,6 @@ class RobotApiService {
         const url = `${this.baseUrl}${path}`;
         
         const defaultHeaders = { 'Content-Type': 'application/json' };
-
         const config = {
             ...options,
             headers: { ...defaultHeaders, ...options.headers }
@@ -29,12 +28,18 @@ class RobotApiService {
                 return null;
             }
 
-            // Check if the request was successful (Status 200-299)
             if (!response.ok) {
                 const errorText = await response.text().catch(() => 'Unknown Error');
                 throw new Error(`${response.status} - ${errorText}`);
             }
-            return await response.json();
+
+            const contentLength = response.headers.get("content-length");
+            if (contentLength && parseInt(contentLength) === 0) {
+                return null; 
+            }
+            
+            const text = await response.text();
+            return text ? JSON.parse(text) : {};
 
         } catch (error) {
             console.error(`API Error at ${path}:`, error);
@@ -76,6 +81,10 @@ class RobotApiService {
     getActions(id, page = 1, size = 5) {
         const safeId = encodeURIComponent(id);
         return this._request(`/${safeId}/actions?page=${page}&size=${size}`);
+    }
+
+    async reset() {
+        return this._request('/reset', { method: 'POST' });
     }
 }
 

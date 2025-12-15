@@ -29,7 +29,6 @@ public class RobotController {
     @Autowired
     private RobotService robotService;
 
-    // Optional<T> in HTTP reponse
     private <T> ResponseEntity<T> toResponseEntity(Optional<T> optional) {
         return optional.map(ResponseEntity::ok)
                        .orElse(ResponseEntity.notFound().build());
@@ -41,13 +40,11 @@ public class RobotController {
         // Remove all links before adding new ones.
         robot.removeLinks(); 
         
-        // 1. "self" link
         robot.add(linkTo((Object) methodOn(RobotController.class)
             .getRobotStatus(robot.getId())).withSelfRel());
 
-        // 2. "actions" link
         String actionsUri = linkTo((Object) methodOn(RobotController.class)
-            .getRobotActions(robot.getId(), 1, 5)) // standard on Seite 1, size 5
+            .getRobotActions(robot.getId(), 1, 5))
             .toUriComponentsBuilder()
             .build().toUriString();
         
@@ -60,7 +57,6 @@ public class RobotController {
     @GetMapping("/{id}/status")
     public ResponseEntity<Robot> getRobotStatus(@PathVariable String id) {
         Optional<Robot> robotOpt = robotService.getRobotStatus(id);
-        // HATEOAS part is here handled by the helper method
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }
@@ -95,7 +91,6 @@ public class RobotController {
     @PatchMapping("/{id}/state")
     public ResponseEntity<Robot> patchRobotState(@PathVariable String id, @RequestBody PatchStateRequest patchRequest) {
         Optional<Robot> robotOpt = robotService.updateRobotState(id, patchRequest);
-        // Add HATEOAS links to the PATCH response
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
     }
@@ -106,7 +101,7 @@ public class RobotController {
     @GetMapping("/{id}/actions")
     public ResponseEntity<PagedActionsResponse> getRobotActions(
             @PathVariable String id,
-            @RequestParam(defaultValue = "1") int page, // Standard on 1
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
         // Ensure the API is 1-based and inputs 0 or 1 map to the first page (index 0)
@@ -174,5 +169,12 @@ public class RobotController {
         Optional<Robot> robotOpt = robotService.attackRobot(id, targetId);
         robotOpt.ifPresent(this::addLinksToRobot);
         return toResponseEntity(robotOpt);
+    }
+
+    // POST /robots/reset
+    @PostMapping("/reset")
+    public ResponseEntity<Void> resetAll() {
+        robotService.resetSystem();
+        return ResponseEntity.ok().build();
     }
 }

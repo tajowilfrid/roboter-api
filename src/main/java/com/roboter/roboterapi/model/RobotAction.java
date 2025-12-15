@@ -1,18 +1,18 @@
 package com.roboter.roboterapi.model;
 
 import lombok.Data;
-import org.springframework.hateoas.Link; // Spring HATEOAS Link
+import org.springframework.hateoas.Link;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data // Lombok for Getter/Setter
+@Data
 public class RobotAction {
 
-    private long id; // Unique ID for each action
-    private String action; // e.g. "Moved", "Picked up"
-    private String detail; // e.g. "up", "diamant"
-    private Instant timestamp; // When the action occurred
+    private long id;
+    private String action;
+    private String detail;
+    private Instant timestamp;
     
     private List<Link> links = new ArrayList<>();
 

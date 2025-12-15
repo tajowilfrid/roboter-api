@@ -192,4 +192,15 @@ public class RobotService {
     public void createRobot(String id) {
         robotRepository.save(new Robot(id));
     }
+
+    /**
+     * Resets the entire system by clearing all robots from the repository
+     */
+    public void resetSystem() {
+        //robotRepository.findAll().clear();
+        robotRepository.deleteAll();
+        createRobot("r1");
+        createRobot("r2");
+        createRobot("r3");
+    }
 }

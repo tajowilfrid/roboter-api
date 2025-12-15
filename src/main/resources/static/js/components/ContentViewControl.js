@@ -103,6 +103,7 @@ class ContentViewControl extends HTMLElement {
      */
     updateUI(robot) {
         const root = this.shadowRoot;
+        const dot = this.shadowRoot.getElementById('robot-dot');
         
         // Update text values
         root.getElementById('val-energy').innerText = `${robot.energy}%`;
@@ -116,6 +117,17 @@ class ContentViewControl extends HTMLElement {
         } else {
             energyBox.style.borderLeftColor = 'var(--status-success)';
         }
+
+        const stepSize = 20; 
+        const centerX = 100;
+        const centerY = 100;
+        
+        // Calculate new position for the robot dot on the map
+        const newLeft = centerX + (robot.position.x * stepSize);
+        const newTop = centerY - (robot.position.y * stepSize);
+        
+        dot.style.left = `${newLeft}px`;
+        dot.style.top = `${newTop}px`;
     }
 
     render() {
@@ -138,6 +150,12 @@ class ContentViewControl extends HTMLElement {
                     </div>
                 </div>
 
+                <div class="map-container">
+                    <div id="grid-map" class="grid-map">
+                        </div>
+                    <div id="robot-dot" class="robot-dot">🤖</div>
+                </div>
+
                 <div class="control-pad">
                     <div></div>
                     <button class="btn btn-ctrl" data-dir="up">${this.icons.up}</button>
@@ -156,4 +174,5 @@ class ContentViewControl extends HTMLElement {
     }
 }
 
-customElements.define('content-view-control', ContentViewControl);
+if(customElements.get('content-view-control')===undefined)
+    customElements.define('content-view-control', ContentViewControl);

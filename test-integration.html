@@ -53,7 +53,7 @@
 
     <h1>Integration Test</h1>
     <p class="description">
-        This page simulates a 3rd-party website loading the bundled Web Components 
+        This page simulates a website loading the bundled Web Components 
         directly from the Google Cloud CDN.
     </p>
 
@@ -66,10 +66,6 @@
     <script type="module" src="https://storage.googleapis.com/roboter-frontend-assets/robot-components.es.js"></script>
 
     <script>
-        /**
-         * Initialization Script
-         * We need to wait until the external module is fully loaded and executed.
-         */
         window.addEventListener('load', () => {
             
             // Check if our global entry point exists (defined in main.js / vite config)

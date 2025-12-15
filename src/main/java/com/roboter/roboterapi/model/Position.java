@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /*
- *@Data (from Lombok) automatically creates getters, setters, toString, etc.
+ *@Data (from Lombok) automatically creates getters, setters, toString.
  *@NoArgsConstructor empty constructor for JSON
  *@AllArgsConstructor all fields constructor 
  */

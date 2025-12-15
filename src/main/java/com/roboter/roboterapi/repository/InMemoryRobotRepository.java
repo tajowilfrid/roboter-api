@@ -30,4 +30,8 @@ public class InMemoryRobotRepository {
     public Collection<Robot> findAll() {
         return robots.values();
     }
+
+    public void deleteAll() {
+        robots.clear();
+    }
 }

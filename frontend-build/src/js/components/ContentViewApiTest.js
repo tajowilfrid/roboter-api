@@ -145,4 +145,5 @@ class ContentViewApiTest extends HTMLElement {
     }
 }
 
-customElements.define('content-view-api-test', ContentViewApiTest);
+if(customElements.get('content-view-api-test')===undefined)
+    customElements.define('content-view-api-test', ContentViewApiTest);

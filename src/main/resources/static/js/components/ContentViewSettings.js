@@ -1,5 +1,6 @@
 import { attachSharedStyles } from '../utils/DOMUtils.js';
 import { store } from '../store/Store.js';
+import { api } from '../api/RobotApiService.js';
 
 /**
  * * This component renders a simple form to configure global settings.
@@ -17,7 +18,6 @@ class ContentViewSettings extends HTMLElement {
      */
     connectedCallback() {
         attachSharedStyles(this.shadowRoot);
-
         this.render();
         this.setupLogic();
     }
@@ -32,6 +32,7 @@ class ContentViewSettings extends HTMLElement {
         const userIn = this.shadowRoot.getElementById('in-user');
         const robotIn = this.shadowRoot.getElementById('in-robot');
         const saveBtn = this.shadowRoot.getElementById('btn-save');
+        const resetBtn = this.shadowRoot.getElementById('btn-reset');
 
         userIn.value = state.username;
         robotIn.value = state.robotId;
@@ -41,6 +42,18 @@ class ContentViewSettings extends HTMLElement {
             store.setRobotId(robotIn.value);
             
             alert('Settings saved successfully.');
+        });
+
+        resetBtn.addEventListener('click', async () => {
+            if(confirm("Are you sure you want to reset the system? All progress will be lost.")) {
+                try {
+                    await api.reset();
+                    alert("System has been reset!");
+                    window.location.reload(); 
+                } catch(e) {
+                    alert("Error during reset: " + e.message);
+                }
+            }
         });
     }
 
@@ -65,9 +78,19 @@ class ContentViewSettings extends HTMLElement {
                     </svg>
                     Save Settings
                 </button>
+
+                <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="color: var(--status-danger)">Danger Zone</h3>
+                    <p class="muted">Resets all robots to position (0,0) and 100% energy.</p>
+                    
+                    <button id="btn-reset" class="btn" style="border-color: var(--status-danger); color: var(--status-danger);">
+                        System Reset
+                    </button>
+                </div>
             </article>
         `;
     }
 }
 
-customElements.define('content-view-settings', ContentViewSettings);
+if(customElements.get('content-view-settings')===undefined)
+    customElements.define('content-view-settings', ContentViewSettings);
